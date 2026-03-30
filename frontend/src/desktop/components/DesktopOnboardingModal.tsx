@@ -91,7 +91,7 @@ export function DesktopOnboardingModal() {
         {/* Hero section — gradient changes per slide */}
         <div className={styles.heroWrapper} style={{ flexShrink: 0 }}>
           <AnimatedSlideBackground
-            gradientStops={(step === 0 ? welcomeSlide.background.gradientStops : SIGN_IN_GRADIENT) as [string, string]}
+            gradientStops={step === 0 ? welcomeSlide.background.gradientStops : SIGN_IN_GRADIENT}
             circles={welcomeSlide.background.circles}
             isActive
             slideKey={step === 0 ? 'desktop-welcome' : 'desktop-sign-in'}

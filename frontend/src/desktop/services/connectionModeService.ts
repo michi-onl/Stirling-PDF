@@ -205,7 +205,7 @@ export class ConnectionModeService {
     console.log(`[ConnectionModeService]    - User Agent: ${navigator.userAgent}`);
     console.log(`[ConnectionModeService]    - Platform: ${navigator.platform}`);
     console.log(`[ConnectionModeService]    - Online: ${navigator.onLine}`);
-    console.log(`[ConnectionModeService]    - Connection Type: ${(navigator as any).connection?.effectiveType || 'unknown'}`);
+    console.log(`[ConnectionModeService]    - Connection Type: ${'connection' in navigator ? (navigator as Navigator & { connection: { effectiveType?: string } }).connection.effectiveType ?? 'unknown' : 'unknown'}`);
     console.log(`[ConnectionModeService]    - Language: ${navigator.language}`);
     console.log(`[ConnectionModeService]    - Cookies Enabled: ${navigator.cookieEnabled}`);
     console.log(`[ConnectionModeService]    - Hardware Concurrency: ${navigator.hardwareConcurrency || 'unknown'} cores`);
@@ -213,7 +213,7 @@ export class ConnectionModeService {
 
     // Check for proxy environment variables
     console.log(`[ConnectionModeService] Environment Check:`);
-    const envProxy = (window as any).process?.env?.HTTP_PROXY || (window as any).process?.env?.HTTPS_PROXY;
+    const envProxy = window.process?.env?.HTTP_PROXY || window.process?.env?.HTTPS_PROXY;
     if (envProxy) {
       console.log(`[ConnectionModeService]    - Proxy detected: ${envProxy}`);
     } else {
@@ -222,16 +222,16 @@ export class ConnectionModeService {
 
     // Check if running in Tauri (v2 uses different detection)
     console.log(`[ConnectionModeService]    - Checking Tauri context...`);
-    console.log(`[ConnectionModeService]    - window.__TAURI__ type: ${typeof (window as any).__TAURI__}`);
-    console.log(`[ConnectionModeService]    - window.__TAURI_INTERNALS__ type: ${typeof (window as any).__TAURI_INTERNALS__}`);
+    console.log(`[ConnectionModeService]    - window.__TAURI__ type: ${typeof window.__TAURI__}`);
+    console.log(`[ConnectionModeService]    - window.__TAURI_INTERNALS__ type: ${typeof window.__TAURI_INTERNALS__}`);
     console.log(`[ConnectionModeService]    - window.location.href:`, window.location.href);
     console.log(`[ConnectionModeService]    - window.location.protocol:`, window.location.protocol);
 
     // Tauri v2 detection: check for __TAURI_INTERNALS__ or tauri:// protocol
-    const isTauriV2 = typeof (window as any).__TAURI_INTERNALS__ !== 'undefined' ||
+    const isTauriV2 = typeof window.__TAURI_INTERNALS__ !== 'undefined' ||
                       window.location.protocol === 'tauri:' ||
                       window.location.hostname === 'tauri.localhost';
-    const isTauriV1 = typeof (window as any).__TAURI__ !== 'undefined';
+    const isTauriV1 = typeof window.__TAURI__ !== 'undefined';
     const isTauri = isTauriV1 || isTauriV2;
 
     console.log(`[ConnectionModeService]    - Running in Tauri v1: ${isTauriV1}`);
@@ -240,13 +240,11 @@ export class ConnectionModeService {
 
     if (isTauri) {
       if (isTauriV1) {
-        const tauriApi = (window as any).__TAURI__;
-        console.log(`[ConnectionModeService]    - Tauri v1 API:`, tauriApi);
+        console.log(`[ConnectionModeService]    - Tauri v1 API:`, window.__TAURI__);
       }
       if (isTauriV2) {
         console.log(`[ConnectionModeService]    - Tauri v2 detected via internals/protocol`);
-        const internals = (window as any).__TAURI_INTERNALS__;
-        console.log(`[ConnectionModeService]    - Tauri internals:`, internals);
+        console.log(`[ConnectionModeService]    - Tauri internals:`, window.__TAURI_INTERNALS__);
       }
     }
 
@@ -511,7 +509,10 @@ export class ConnectionModeService {
       console.log(`[ConnectionModeService] 🔗 ${stageName}: Attempting fetch to ${url}`);
       console.log(`[ConnectionModeService]    - Certificate validation: ${disableCertValidation ? 'DISABLED' : 'ENABLED'}`);
 
-      const fetchOptions: any = {
+      const fetchOptions: RequestInit & {
+        connectTimeout?: number;
+        danger?: { acceptInvalidCerts: boolean; acceptInvalidHostnames: boolean };
+      } = {
         method: 'GET',
         connectTimeout: 10000,
       };

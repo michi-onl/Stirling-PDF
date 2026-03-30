@@ -84,6 +84,7 @@ export default defineConfig(
   // Folders that have been cleaned up and are now conformant - stricter rules enforced here
   {
     files: [
+      'src/desktop/**/*.{js,mjs,jsx,ts,tsx}',
       'src/proprietary/**/*.{js,mjs,jsx,ts,tsx}',
       'src/saas/**/*.{js,mjs,jsx,ts,tsx}',
     ],

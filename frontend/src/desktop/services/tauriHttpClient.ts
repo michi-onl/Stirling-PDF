@@ -5,7 +5,7 @@ import { fetch } from '@tauri-apps/plugin-http';
  * Provides axios-compatible API while bypassing CORS restrictions
  */
 
-export interface TauriHttpResponse<T = any> {
+export interface TauriHttpResponse<T = unknown> {
   data: T;
   status: number;
   statusText: string;
@@ -18,8 +18,8 @@ export interface TauriHttpRequestConfig {
   method?: string;
   baseURL?: string;
   headers?: Record<string, string>;
-  params?: Record<string, string | number | boolean> | any;
-  data?: any;
+  params?: Record<string, string | number | boolean>;
+  data?: unknown;
   timeout?: number;
   responseType?: 'json' | 'text' | 'blob' | 'arraybuffer';
   withCredentials?: boolean;
@@ -29,7 +29,7 @@ export interface TauriHttpRequestConfig {
   skipAuthRedirect?: boolean;
   // Axios compatibility properties (ignored by Tauri HTTP)
   suppressErrorToast?: boolean;
-  cancelToken?: any;
+  cancelToken?: { promise: Promise<unknown> };
   signal?: AbortSignal;
 }
 
@@ -43,8 +43,8 @@ export interface TauriHttpError extends Error {
 }
 
 type RequestInterceptor = (config: TauriHttpRequestConfig) => Promise<TauriHttpRequestConfig> | TauriHttpRequestConfig;
-type ResponseInterceptor<T = any> = (response: TauriHttpResponse<T>) => Promise<TauriHttpResponse<T>> | TauriHttpResponse<T>;
-type ErrorInterceptor = (error: any) => Promise<any>;
+type ResponseInterceptor<T = unknown> = (response: TauriHttpResponse<T>) => Promise<TauriHttpResponse<T>> | TauriHttpResponse<T>;
+type ErrorInterceptor = (error: unknown) => Promise<unknown>;
 
 interface Interceptors {
   request: {
@@ -152,7 +152,7 @@ class TauriHttpClient {
     return url;
   }
 
-  private async executeRequest<T = any>(config: TauriHttpRequestConfig): Promise<TauriHttpResponse<T>> {
+  private async executeRequest<T = unknown>(config: TauriHttpRequestConfig): Promise<TauriHttpResponse<T>> {
     // Merge with defaults
     const mergedConfig: TauriHttpRequestConfig = {
       ...this.defaults,
@@ -197,7 +197,9 @@ class TauriHttpClient {
 
       // Make the request using Tauri's native HTTP client (standard Fetch API)
       // Enable certificate bypass for HTTPS to handle missing intermediate certs and self-signed certs
-      const fetchOptions: any = {
+      const fetchOptions: RequestInit & {
+        danger?: { acceptInvalidCerts: boolean; acceptInvalidHostnames: boolean };
+      } = {
         method,
         headers,
         body,
@@ -417,35 +419,35 @@ class TauriHttpClient {
     }
   }
 
-  async request<T = any>(config: TauriHttpRequestConfig): Promise<TauriHttpResponse<T>> {
+  async request<T = unknown>(config: TauriHttpRequestConfig): Promise<TauriHttpResponse<T>> {
     return this.executeRequest<T>(config);
   }
 
-  async get<T = any>(url: string, config?: TauriHttpRequestConfig): Promise<TauriHttpResponse<T>> {
+  async get<T = unknown>(url: string, config?: TauriHttpRequestConfig): Promise<TauriHttpResponse<T>> {
     return this.executeRequest<T>({ ...config, method: 'GET', url });
   }
 
-  async delete<T = any>(url: string, config?: TauriHttpRequestConfig): Promise<TauriHttpResponse<T>> {
+  async delete<T = unknown>(url: string, config?: TauriHttpRequestConfig): Promise<TauriHttpResponse<T>> {
     return this.executeRequest<T>({ ...config, method: 'DELETE', url });
   }
 
-  async head<T = any>(url: string, config?: TauriHttpRequestConfig): Promise<TauriHttpResponse<T>> {
+  async head<T = unknown>(url: string, config?: TauriHttpRequestConfig): Promise<TauriHttpResponse<T>> {
     return this.executeRequest<T>({ ...config, method: 'HEAD', url });
   }
 
-  async options<T = any>(url: string, config?: TauriHttpRequestConfig): Promise<TauriHttpResponse<T>> {
+  async options<T = unknown>(url: string, config?: TauriHttpRequestConfig): Promise<TauriHttpResponse<T>> {
     return this.executeRequest<T>({ ...config, method: 'OPTIONS', url });
   }
 
-  async post<T = any>(url: string, data?: any, config?: TauriHttpRequestConfig): Promise<TauriHttpResponse<T>> {
+  async post<T = unknown>(url: string, data?: unknown, config?: TauriHttpRequestConfig): Promise<TauriHttpResponse<T>> {
     return this.executeRequest<T>({ ...config, method: 'POST', url, data });
   }
 
-  async put<T = any>(url: string, data?: any, config?: TauriHttpRequestConfig): Promise<TauriHttpResponse<T>> {
+  async put<T = unknown>(url: string, data?: unknown, config?: TauriHttpRequestConfig): Promise<TauriHttpResponse<T>> {
     return this.executeRequest<T>({ ...config, method: 'PUT', url, data });
   }
 
-  async patch<T = any>(url: string, data?: any, config?: TauriHttpRequestConfig): Promise<TauriHttpResponse<T>> {
+  async patch<T = unknown>(url: string, data?: unknown, config?: TauriHttpRequestConfig): Promise<TauriHttpResponse<T>> {
     return this.executeRequest<T>({ ...config, method: 'PATCH', url, data });
   }
 
@@ -458,7 +460,7 @@ class TauriHttpClient {
     return this.buildUrl({ ...this.defaults, ...config });
   }
 
-  async postForm<T = any>(url: string, data?: any, config?: TauriHttpRequestConfig): Promise<TauriHttpResponse<T>> {
+  async postForm<T = unknown>(url: string, data?: unknown, config?: TauriHttpRequestConfig): Promise<TauriHttpResponse<T>> {
     const formData = data instanceof FormData ? data : new FormData();
     if (!(data instanceof FormData) && data && typeof data === 'object') {
       Object.entries(data).forEach(([key, value]) => {
@@ -468,7 +470,7 @@ class TauriHttpClient {
     return this.post<T>(url, formData, config);
   }
 
-  async putForm<T = any>(url: string, data?: any, config?: TauriHttpRequestConfig): Promise<TauriHttpResponse<T>> {
+  async putForm<T = unknown>(url: string, data?: unknown, config?: TauriHttpRequestConfig): Promise<TauriHttpResponse<T>> {
     const formData = data instanceof FormData ? data : new FormData();
     if (!(data instanceof FormData) && data && typeof data === 'object') {
       Object.entries(data).forEach(([key, value]) => {
@@ -478,7 +480,7 @@ class TauriHttpClient {
     return this.put<T>(url, formData, config);
   }
 
-  async patchForm<T = any>(url: string, data?: any, config?: TauriHttpRequestConfig): Promise<TauriHttpResponse<T>> {
+  async patchForm<T = unknown>(url: string, data?: unknown, config?: TauriHttpRequestConfig): Promise<TauriHttpResponse<T>> {
     const formData = data instanceof FormData ? data : new FormData();
     if (!(data instanceof FormData) && data && typeof data === 'object') {
       Object.entries(data).forEach(([key, value]) => {

@@ -228,7 +228,7 @@ export const ServerSelection: React.FC<ServerSelectionProps> = ({ onSelect, load
                 setCustomUrl(serverUrl);
                 // Auto-submit the form after setting the URL
                 setTimeout(() => {
-                  handleSubmit(new Event('submit') as any);
+                  handleSubmit(new Event('submit') as React.FormEvent);
                 }, 0);
               }}
             >
