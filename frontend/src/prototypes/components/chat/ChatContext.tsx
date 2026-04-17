@@ -190,6 +190,8 @@ export function ChatProvider({ children }: { children: ReactNode }) {
   const [state, dispatch] = useReducer(chatReducer, initialState);
   const { files: activeFiles } = useAllFiles();
   const abortRef = useRef<AbortController | null>(null);
+  const messagesRef = useRef<ChatMessage[]>(state.messages);
+  messagesRef.current = state.messages;
 
   const toggleOpen = useCallback(() => dispatch({ type: "TOGGLE_OPEN" }), []);
   const setOpen = useCallback(
@@ -203,6 +205,8 @@ export function ChatProvider({ children }: { children: ReactNode }) {
       abortRef.current?.abort();
       const controller = new AbortController();
       abortRef.current = controller;
+
+      const priorMessages = messagesRef.current;
 
       const userMessage: ChatMessage = {
         id: crypto.randomUUID(),
@@ -219,6 +223,10 @@ export function ChatProvider({ children }: { children: ReactNode }) {
         formData.append("userMessage", content);
         activeFiles.forEach((file, i) => {
           formData.append(`fileInputs[${i}].fileInput`, file);
+        });
+        priorMessages.forEach((message, i) => {
+          formData.append(`conversationHistory[${i}].role`, message.role);
+          formData.append(`conversationHistory[${i}].content`, message.content);
         });
 
         const response = await fetch("/api/v1/ai/orchestrate/stream", {
