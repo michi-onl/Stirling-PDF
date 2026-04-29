@@ -2096,6 +2096,16 @@ calling_engine = "KI denkt nach..."
 extracting_content = "Inhalt wird aus Ihren Dokumenten extrahiert..."
 processing = "Extrahierter Inhalt wird verarbeitet..."
 thinking = "Wird verarbeitet..."
+executing_tool_generic = "Tool wird ausgeführt..."
+executing_tool_generic_step = "Tool wird ausgeführt (Schritt {{step}} von {{total}})..."
+executing_tool_single = "{{tool}} wird ausgeführt..."
+executing_tool_step = "{{tool}} wird ausgeführt (Schritt {{step}} von {{total}})..."
+
+[chat.toolsUsed]
+summary = "{{count}} Tools ausgeführt"
+summary_one = "1 Tool ausgeführt"
+summary_other = "{{count}} Tools ausgeführt"
+unknownTool = "Unbekanntes Tool"
 
 [certSign]
 allSigned = "Alle Teilnehmer haben signiert. Bereit zum Finalisieren."
@@ -2813,6 +2823,33 @@ unlinkedTitle = "Unabhängiges Scrollen & Verschieben aktiviert"
 
 [compare.too.dissimilar]
 message = "Diese Dokumente scheinen sehr unähnlich zu sein. Der Vergleich wurde zur Zeitersparnis gestoppt."
+
+[compare.mode]
+pixel = "Pixelvergleich"
+text = "Textvergleich"
+
+[compare.pixel]
+base = "Original"
+changed = "Geändert"
+comparison = "Bearbeitet"
+diff = "Unterschiede"
+diffOnly = "Nur Unterschiede"
+missingInBase = "Im Original fehlend"
+missingInComparison = "In Bearbeitung fehlend"
+overall = "Gesamt"
+overlay = "Überlagerung"
+pageLabel = "Seite"
+pagesChanged = "Seiten geändert"
+sideBySide = "Nebeneinander"
+sizeMismatch = "Größenabweichung"
+summaryTitle = "Pixelvergleich"
+
+[compare.pixel.errors]
+canvasContextUnavailable = "2D-Canvas-Kontext für Pixelvergleich konnte nicht erstellt werden."
+
+[compare.pixel.warnings]
+noPages = "Eines oder beide Dokumente enthalten keine Seiten."
+pageCountMismatch = "Seitenzahl stimmt nicht überein: Original hat {{base}} Seite(n), Bearbeitung hat {{comparison}}. Zusätzliche Seiten werden einseitig angezeigt und als vollständig entfernt/hinzugefügt markiert."
 
 [compress]
 credit = "Dieser Dienst verwendet qpdf für die PDF-Komprimierung/-Optimierung."
